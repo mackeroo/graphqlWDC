@@ -2,16 +2,23 @@
   "name": "graphqlwdc",
   "version": "1.0.0",
   "description": "Tableau Web Data Connector for GraphQL APIs",
-  "main": "app.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "build": "webpack"
   },
   "author": "Mac Lee",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "cookie-parser": "^1.4.4",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "moment": "^2.24.0",
     "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11"
   }
 }

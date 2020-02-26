@@ -7,8 +7,9 @@ var querystring = require("querystring");
 var http = require("http");
 var request = require("request");
 var path = require("path");
-var config = require("./config.js"); // Get our config info (app id and app secret)
-
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 var sys = require("util");
 
 var app = express();
@@ -16,18 +17,20 @@ var app = express();
 // -------------------------------------------------- //
 // Express set-up and middleware
 // -------------------------------------------------- //
-app.set("port", process.env.PORT || config.PORT);
+app.set("port", process.env.PORT);
 app.use(cookieParser()); // cookieParser middleware to work with cookies
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/dist"));
 
 // -------------------------------------------------- //
 // Variables
 // -------------------------------------------------- //
-var clientID = process.env.FOURSQUARE_CLIENT_ID || config.CLIENT_ID;
-var clientSecret = process.env.FOURSQUARE_CLIENT_SECRET || config.CLIENT_SECRET;
-console.log(clientID);
-console.log(clientSecret);
-var redirectURI = config.HOSTPATH + ":" + config.PORT + config.REDIRECT_PATH;
+var clientID = process.env.CLIENT_ID;
+var clientSecret = process.env.CLIENT_SECRET;
+var hostPort = process.env.PORT;
+var redirectPath = process.env.REDIRECT_PATH;
+var hostPath = process.env.HOSTPATH;
+
+var redirectURI = hostPath + ":" + hostPort + redirectPath;
 
 // -------------------------------------------------- //
 // Routes
@@ -67,6 +70,7 @@ app.get("/redirect", function(req, res) {
   };
 
   // Make the request
+  fetch("http://");
   request(options, function(error, response, body) {
     if (!error) {
       // We should receive  { access_token: ACCESS_TOKEN }
