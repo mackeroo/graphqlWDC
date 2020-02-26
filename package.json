@@ -10,7 +10,7 @@
     "build": "webpack --config webpack.prod.js",
     "server": "node server.js"
   },
-  "author": "Mac Lee",
+  "author": "Mac Lee <macstlee@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "cookie-parser": "^1.4.4",
