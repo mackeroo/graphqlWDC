@@ -4,6 +4,7 @@
 var express = require("express");
 var cookieParser = require("cookie-parser");
 var querystring = require("querystring");
+const webpack = require("webpack");
 var http = require("http");
 var request = require("request");
 var path = require("path");

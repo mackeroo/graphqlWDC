@@ -1,6 +1,6 @@
 (function() {
   "use strict";
-  console.log("here", process.env);
+  console.log("here", process.env.PORT);
   // This config stores the important strings needed to
   // connect to the foursquare API and OAuth service
   //
