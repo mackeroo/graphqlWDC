@@ -7,14 +7,12 @@
   // See part II. of this tutorial for an example of how
   // to do a server-side OAuth flow and avoid this problem
   var config = {
-    clientId:
-      "365358090-q5rluaajlfhif5ml3t86tuoc11nmistq.apps.googleusercontent.com",
-    redirectUri: "http://localhost:3333/redirect",
+    clientId: process.env.CLIENT_ID,
+    redirectUri: process.env.REDIRECT_URL,
     authUrl: "https://accounts.google.com/o/oauth2/v2/auth",
     responseType: "code",
     scope: "profile email"
   };
-  console.log("test5");
 
   // Called when web page first loads and when
   // the OAuth flow returns to the page
@@ -25,27 +23,6 @@
     var accessToken = Cookies.get("accessToken");
     var hasAuth = accessToken && accessToken.length > 0;
     updateUIWithAuthState(hasAuth);
-
-    // const queryString = `{allUsers{
-    //                 edges{
-    //                   node{
-    //                     id
-    //                     username
-    //                   }
-    //                 }
-    //               }}`;
-
-    // fetch("http://localhost:1337/graphiql", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Accept: "application/json"
-    //   },
-    //   body: JSON.stringify({ query: queryString })
-    // })
-    //   .then(r => r.json())
-    //   .then(data => console.log("data returned:", data))
-    //   .catch(err => console.log(err));
 
     $("#connectbutton").click(function() {
       doAuthRedirect();

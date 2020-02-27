@@ -105,33 +105,25 @@ app.get("/redirect", function(req, res) {
 
   // Make the request
   var graph = graphql(apiUrl);
-  console.log(AUTHENTICATE_USER);
-  res.redirect("/index.html");
+  var authUser = graph(AUTHENTICATE_USER);
 
-  // var authUser = graph(AUTHENTICATE_USER);
+  authUser({
+    code: authCode,
+    redirectUrl: redirectUrl
+  })
+    .then(data => {
+      // We should receive {authenticateUser: {token: ACCESS_TOKEN}}
 
-  // authUser({
-  //   code: authCode,
-  //   redirectUrl: redirectUrl
-  // });
+      var accessToken = data.authenticateUser.token;
+      console.log("accessToken: " + accessToken);
 
-  // request(options, function(error, response, body) {
-  //   if (!error) {
-  //     // We should receive  { access_token: ACCESS_TOKEN }
-  //     // if everything went smoothly, so parse the token from the response
-  //     body = JSON.parse(body);
-  //     var accessToken = body.access_token;
-  //     console.log("accessToken: " + accessToken);
+      // set the token in cookies so the client can access it
+      res.cookie("accessToken", accessToken, {});
 
-  //     // Set the token in cookies so the client can access it
-  //     res.cookie("accessToken", accessToken, {});
-
-  //     // Head back to the WDC page
-  //     res.redirect("/index.html");
-  //   } else {
-  //     console.log(error);
-  //   }
-  // });
+      // Head back to the WDC page
+      res.redirect("/index.html");
+    })
+    .catch(err => console.log(err));
 });
 
 // -------------------------------------------------- //
