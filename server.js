@@ -81,28 +81,6 @@ app.get("/redirect", function(req, res) {
   authCode = req.query.code;
   console.log("Auth Code is: " + authCode);
 
-  // Set up a request for an long-lived Access Token now that we have a code
-  var requestObject = {
-    client_id: clientID,
-    redirect_uri: redirectUrl,
-    client_secret: clientSecret,
-    code: authCode,
-    grant_type: "authorization_code"
-  };
-  console.log("here blalba", requestObject);
-
-  var token_request_header = {
-    "Content-Type": "application/x-www-form-urlencoded"
-  };
-
-  // Build the post request for the OAuth endpoint
-  var options = {
-    method: "POST",
-    url: "https://foursquare.com/oauth2/access_token",
-    form: requestObject,
-    headers: token_request_header
-  };
-
   // Make the request
   var graph = graphql(apiUrl);
   var authUser = graph(AUTHENTICATE_USER);

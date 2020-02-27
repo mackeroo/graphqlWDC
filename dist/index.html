@@ -31,8 +31,18 @@
       <a href="#" id="connectbutton"><img src="static-files/btn_google_signin_dark_normal_web.png" alt="Login"/></a>
       <br /><br />
 
-      <!-- This button will pull the user's liked venues once the user is authenticated -->
-      <p><a href="#" class="btn btn-primary btn-block" id="getvenuesbutton"><span class="glyphicon glyphicon-arrow-down"></span> Get Venues I Like</a></p>
+  </div>
+   <div style="margin: auto; text-align: center">
+      <!-- graphql query input -->
+      <label for="gqlquery">GraphQL query:</label>
+      <p><textarea id="gqlquery" name="gqlquery" cols="40" rows="10"></textarea></p>
+      <!-- Execute query if user is authenticated -->
+      <p style="margin: auto; text-align: center; margin-top: 10px; max-width: 300px">
+        <a href="#" class="btn btn-primary btn-block" id="executequerybutton">
+          Execute Query
+        </a>
+      </p>
+
   </div>
 </body>
 </html>
