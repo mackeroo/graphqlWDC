@@ -1,21 +1,21 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const Dotenv = require("dotenv-webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const path = require("path");
 
 module.exports = {
-  entry: {
-    app: "./src/index.js"
-  },
   plugins: [
     new HtmlWebpackPlugin({
       title: "Production",
       template: "./src/index.html"
-    }),
-    new Dotenv()
+    })
   ],
+  entry: {
+    app: "./src/index.js"
+  },
   output: {
     filename: "[name].bundle.js",
-    path: path.resolve(__dirname, "dist")
+    path: path.join(__dirname, "dist"),
+    publicPath: "/"
   },
   module: {
     rules: [

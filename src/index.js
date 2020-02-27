@@ -1,6 +1,5 @@
 (function() {
   "use strict";
-  console.log("here", process.env.PORT);
   // This config stores the important strings needed to
   // connect to the foursquare API and OAuth service
   //
@@ -15,6 +14,7 @@
     responseType: "code",
     scope: "profile email"
   };
+  console.log("test5");
 
   // Called when web page first loads and when
   // the OAuth flow returns to the page
