@@ -31,13 +31,7 @@
     });
 
     $("#executequerybutton").click(function() {
-      fetch("/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }).then(r => console.log(r));
-      tableau.connectionName = "GraphQL query Data";
+      tableau.connectionName = "MA Data";
       tableau.submit();
     });
   });
@@ -54,18 +48,6 @@
 
     var url = `${config.authUrl}?response_type=${config.responseType}&client_id=${appId}&redirect_uri=${config.redirectUri}&scope=${config.scope}`;
     window.location.href = url;
-  }
-
-  //------------- OAuth Helpers -------------//
-  // This helper function returns the URI for the venueLikes endpoint
-  // It appends the passed in accessToken to the call to personalize the call for the user
-  function getVenueLikesURI(accessToken) {
-    return (
-      "https://api.foursquare.com/v2/users/self/venuelikes?oauth_token=" +
-      accessToken +
-      "&v=" +
-      config.version
-    );
   }
 
   // This function toggles the label shown depending
@@ -132,18 +114,48 @@
   myConnector.getSchema = function(schemaCallback) {
     var schema = [];
 
-    var col1 = { id: "Name", dataType: "string" };
-    var col2 = { id: "Latitude", dataType: "float" };
-    var col3 = { id: "Longitude", dataType: "float" };
-    var col4 = { id: "Address", dataType: "string" };
-    var cols = [col1, col2, col3, col4];
-
-    var tableInfo = {
-      id: "FoursquareTable",
-      columns: cols
+    var madbRequestTableColumns = [
+      { id: "requestId", alias: "MADB Number", dataType: "int" },
+      { id: "deliveryMethod", dataType: "string" },
+      { id: "format", dataType: "string" },
+      { id: "variantInfo", dataType: "string" },
+      { id: "submitterUnix", dataType: "string" },
+      { id: "proNumber", dataType: "int" },
+      { id: "purNumber", dataType: "int" },
+      { id: "commonName", dataType: "string" },
+      { id: "isotype", dataType: "string" },
+      { id: "isotypeOther", dataType: "string" },
+      {
+        id: "experimentCollectionId",
+        alias: "Experiment Collection GQL ID",
+        dataType: "string"
+      }
+    ];
+    var madbRequestTable = {
+      id: "madbRequestTable",
+      columns: madbRequestTableColumns
     };
+    schema.push(madbRequestTable);
 
-    schema.push(tableInfo);
+    var madbAssaySummaryTableColumns = [
+      {
+        id: "stressPlatform",
+        alias: "Stress platform name",
+        dataType: "string"
+      },
+      { id: "requestId", alias: "MADB Number", dataType: "int" },
+      { id: "requestedTestInfoId", alias: "Test ID in MADB", dataType: "int" },
+      {
+        id: "experimentCollectionId",
+        alias: "Experiment Collection GQL ID",
+        dataType: "string"
+      }
+    ];
+    var madbAssaySummaryTable = {
+      id: "madbAssaySummaryTable",
+      columns: madbAssaySummaryTableColumns
+    };
+    schema.push(madbAssaySummaryTable);
 
     schemaCallback(schema);
   };
@@ -155,38 +167,127 @@
     var hasMoreData = false;
 
     var accessToken = tableau.password;
-    var connectionUri = getVenueLikesURI(accessToken);
 
-    var xhr = $.ajax({
-      url: connectionUri,
-      dataType: "json",
-      success: function(data) {
-        if (data.response) {
-          var venues = data.response.venues.items;
-
-          var ii;
-          for (ii = 0; ii < venues.length; ++ii) {
-            var venue = {
-              Name: venues[ii].name,
-              Latitude: venues[ii].location.lat,
-              Longitude: venues[ii].location.lng,
-              Address: venues[ii].location.address
-            };
-            dataToReturn.push(venue);
+    const queryString = `
+    {
+      madbRequests(last:100) {
+        edges {
+          node {
+            requestId
+            deliveryMethod
+            format
+            variantInfo
+            submitterUnix
+            proNumber
+            purNumber
+            commonName
+            portfolioName
+            isotype
+            isotypeOther
+            experimentCollection{
+              id
+            }
+            assayResults {
+              requestedTestInfo {
+                testId
+                testNumber
+                buffer
+              }
+              stressPlatform
+              maMsResults {
+                cdr
+                cdrSequence
+                peptide
+                site
+                sitePosition
+                kabat
+                variable
+                modification
+                percentModified
+                nativeValue
+                dehydratedValue
+                isomerizationValue
+                dioxidationValue
+                trioxidationValue
+                oxidationValue
+                deamidatedValue
+                ammonialossValue
+                trpHydroxykynureninValue
+                trpKynureninValue
+              }
+              maChromatographyResults {
+                secMainValue
+                secHmwfValue
+                secLmwfValue
+                secChromatogram
+                iecMainValue
+                iecBasicsValue
+                iecAcidicsValue
+                iecChromatogram
+                variable
+              }
+            }
           }
-
-          table.appendRows(dataToReturn);
-          doneCallback();
-        } else {
-          tableau.abortWithError("No results found");
         }
-      },
-      error: function(xhr, ajaxOptions, thrownError) {
-        // WDC should do more granular error checking here
-        // or on the server side.  This is just a sample of new API.
-        tableau.abortForAuth("Invalid Access Token");
       }
-    });
+    }    
+    `;
+
+    fetch(process.env.API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify({ query: queryString })
+    })
+      .then(r => r.json())
+      .then(data => {
+        let tableData = [];
+
+        tableau.log(data);
+        data.data.madbRequests.edges
+          .map(e => ({ ...e.node }))
+          .map(request => {
+            if (table.tableInfo.id == "madbRequestTable") {
+              tableData.push({
+                requestId: request.requestId,
+                deliveryMethod: request.deliveryMethod,
+                format: request.format,
+                variantInfo: request.variantInfo,
+                submitterUnix: request.submitterUnix,
+                proNumber: request.proNumber,
+                purNumber: request.purNumber,
+                commonName: request.commonName,
+                portfolioName: request.portfolioName,
+                isotype: request.isotype,
+                isotypeOther: request.isotypeOther,
+                experimentCollectionId:
+                  request.experimentCollection &&
+                  request.experimentCollection.id
+              });
+            }
+            if (table.tableInfo.id == "madbAssaySummaryTable") {
+              request.assayResults.map(result => {
+                tableData.push({
+                  experimentCollectionId:
+                    request.experimentCollection &&
+                    request.experimentCollection.id,
+                  requestId: request.pk,
+                  requestedTestInfoId:
+                    result.requestedTestInfo && result.requestedTestInfo.testId,
+                  stressPlatform: result.stressPlatform
+                });
+              });
+            }
+          });
+
+        table.appendRows(tableData);
+        doneCallback();
+      })
+      .catch(err => {
+        tableau.abortWithError(`Error: ${err}`);
+      });
   };
 
   // Register the tableau connector, call this last
