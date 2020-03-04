@@ -25,11 +25,19 @@
     updateUIWithAuthState(hasAuth);
 
     $("#connectbutton").click(function() {
-      doAuthRedirect();
+      if (!hasAuth) {
+        doAuthRedirect();
+      }
     });
 
-    $("#getvenuesbutton").click(function() {
-      tableau.connectionName = "Foursquare Venues Data";
+    $("#executequerybutton").click(function() {
+      fetch("/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }).then(r => console.log(r));
+      tableau.connectionName = "GraphQL query Data";
       tableau.submit();
     });
   });

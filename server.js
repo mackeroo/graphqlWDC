@@ -99,7 +99,7 @@ app.get("/redirect", function(req, res) {
       res.cookie("accessToken", accessToken, {});
 
       // Head back to the WDC page
-      res.redirect("/index.html");
+      res.sendFile(__dirname + "/index.html");
     })
     .catch(err => console.log(err));
 });

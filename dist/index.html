@@ -35,7 +35,11 @@
    <div style="margin: auto; text-align: center">
       <!-- graphql query input -->
       <label for="gqlquery">GraphQL query:</label>
-      <p><textarea id="gqlquery" name="gqlquery" cols="40" rows="10"></textarea></p>
+      <p>
+        <form method="post" action="/">
+          <textarea id="gqlquery" name="gqlquery" cols="40" rows="10"></textarea>
+        </form>    
+      </p>
       <!-- Execute query if user is authenticated -->
       <p style="margin: auto; text-align: center; margin-top: 10px; max-width: 300px">
         <a href="#" class="btn btn-primary btn-block" id="executequerybutton">
