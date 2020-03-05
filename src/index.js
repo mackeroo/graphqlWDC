@@ -187,7 +187,52 @@
     };
     schema.push(maChromatographyResultsTable);
 
-    var maMassSpecResultsTableColumns = [];
+    var maMassSpecResultsTableColumns = [
+      { id: "requestedTestInfoId", alias: "Test ID in MADB", dataType: "int" },
+      { id: "cdr", alias: "CDR", dataType: "string" },
+      { id: "cdrSequence", alias: "CDR Sequence", dataType: "string" },
+      { id: "cdr", alias: "CDR", dataType: "string" },
+      { id: "site", alias: "Site", dataType: "string" },
+      { id: "site position", alias: "Site Position", dataType: "int" },
+      { id: "kabat", alias: "Kabat", dataType: "string" },
+      { id: "variable", alias: "Variable", dataType: "string" },
+      { id: "percentModified", alias: "Percent Modified", dataType: "float" },
+      { id: "modification", alias: "Modification", dataType: "string" },
+      {
+        id: "isomerizationValue",
+        alias: "Isomerization Value",
+        dataType: "float"
+      },
+      { id: "dioxidationValue", alias: "Dioxidation Value", dataType: "float" },
+      {
+        id: "trioxidationValue",
+        alias: "Trioxidation Value",
+        dataType: "float"
+      },
+      { id: "oxidationValue", alias: "Oxidation Value", dataType: "float" },
+      { id: "deamidatedValue", alias: "Deamidated Value", dataType: "float" },
+      {
+        id: "ammonialossValue",
+        alias: "Ammonia Loss Value",
+        dataType: "float"
+      },
+      {
+        id: "trp_hydroxykynureninValue",
+        alias: "TRP to Hydroxykynurenin Value",
+        dataType: "float"
+      },
+      {
+        id: "trp_kynureninValue",
+        alias: "TRP to Kynurenin Value",
+        dataType: "float"
+      },
+      { id: "nativeValue", alias: "Native Value", dataType: "float" }
+    ];
+    var maMassSpecResultsTable = {
+      id: "maMassSpecResultsTable",
+      columns: maMassSpecResultsTableColumns
+    };
+    schema.push(maMassSpecResultsTable);
 
     schemaCallback(schema);
   };
@@ -331,7 +376,17 @@
                   });
                 });
               }
-              // if (table.tableInfo.id == "")
+
+              if (table.tableInfo.id == "maMassSpecResultsTable") {
+                result.maMsResults.map(ms_result => {
+                  tableData.push({
+                    requestedTestInfoId:
+                      result.requestedTestInfo &&
+                      result.requestedTestInfo.testId,
+                    ...ms_result
+                  });
+                });
+              }
             });
           });
 
