@@ -139,23 +139,55 @@
 
     var madbAssaySummaryTableColumns = [
       {
+        id: "experimentCollectionId",
+        alias: "Experiment Collection GQL ID",
+        dataType: "string"
+      },
+      {
         id: "stressPlatform",
         alias: "Stress platform name",
         dataType: "string"
       },
       { id: "requestId", alias: "MADB Number", dataType: "int" },
-      { id: "requestedTestInfoId", alias: "Test ID in MADB", dataType: "int" },
-      {
-        id: "experimentCollectionId",
-        alias: "Experiment Collection GQL ID",
-        dataType: "string"
-      }
+      { id: "requestedTestInfoId", alias: "Test ID in MADB", dataType: "int" }
     ];
     var madbAssaySummaryTable = {
       id: "madbAssaySummaryTable",
       columns: madbAssaySummaryTableColumns
     };
     schema.push(madbAssaySummaryTable);
+
+    var maChromatographyResultsTableColumns = [
+      { id: "requestedTestInfoId", alias: "Test ID in MADB", dataType: "int" },
+      { id: "secMainValue", alias: "Main Peak value (SEC)", dataType: "float" },
+      { id: "iecMainValue", alias: "Main Peak value (IEC)", dataType: "float" },
+      {
+        id: "secHmwfValue",
+        alias: "Sum of HMW Forms value (SEC)",
+        dataType: "float"
+      },
+      {
+        id: "secLmwfValue",
+        alias: "Sum of LMW Forms value (SEC)",
+        dataType: "float"
+      },
+      {
+        id: "iecAcidicsValue",
+        alias: "Acidics value (IEC)",
+        dataType: "float"
+      },
+      { id: "iecBasicsValue", alias: "Basics value (IEC)", dataType: "float" },
+      { id: "secChromatogram", alias: "SEC Chromatogram", dataType: "string" },
+      { id: "iecChromatogram", alias: "IEC Chromatogram", dataType: "string" },
+      { id: "variable", alias: "Variable", dataType: "string" }
+    ];
+    var maChromatographyResultsTable = {
+      id: "maChromatographyResultsTable",
+      columns: maChromatographyResultsTableColumns
+    };
+    schema.push(maChromatographyResultsTable);
+
+    var maMassSpecResultsTableColumns = [];
 
     schemaCallback(schema);
   };
@@ -267,8 +299,9 @@
                   request.experimentCollection.id
               });
             }
-            if (table.tableInfo.id == "madbAssaySummaryTable") {
-              request.assayResults.map(result => {
+
+            request.assayResults.map(result => {
+              if (table.tableInfo.id == "madbAssaySummaryTable") {
                 tableData.push({
                   experimentCollectionId:
                     request.experimentCollection &&
@@ -278,8 +311,28 @@
                     result.requestedTestInfo && result.requestedTestInfo.testId,
                   stressPlatform: result.stressPlatform
                 });
-              });
-            }
+              }
+
+              if (table.tableInfo.id == "maChromatographyResultsTable") {
+                result.maChromatographyResults.map(cm_result => {
+                  tableData.push({
+                    requestedTestInfoId:
+                      result.requestedTestInfo &&
+                      result.requestedTestInfo.testId,
+                    secMainValue: cm_result.secMainValue,
+                    iecMainValue: cm_result.iecMainValue,
+                    secHmwfValue: cm_result.secHmwfValue,
+                    secLmwfValue: cm_result.secLmwfValue,
+                    iecAcidicsValue: cm_result.iecAcidicsValue,
+                    iecBasicsValue: cm_result.iecBasicsValue,
+                    secChromatogram: cm_result.secChromatogram,
+                    iecChromatogram: cm_result.iecChromatogram,
+                    variable: cm_result.variable
+                  });
+                });
+              }
+              // if (table.tableInfo.id == "")
+            });
           });
 
         table.appendRows(tableData);
